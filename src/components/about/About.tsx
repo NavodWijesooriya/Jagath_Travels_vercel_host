@@ -30,7 +30,7 @@ const AboutJagathHero = () => {
               <Quote className="absolute -left-8 -top-4 text-emerald-100 h-16 w-16 -z-10" />
               <p className="text-xl text-slate-600 leading-relaxed font-light">
                 Jagath Travels began with a single mission: to show the world the
-                Sri Lanka that maps don't capture. Not just the landmarks, but
+                Sri Lanka that maps do not capture. Not just the landmarks, but
                 the warmth of a home-cooked meal in the hills and the silence
                 of a dawn safari.
               </p>
@@ -96,7 +96,7 @@ const AboutJagathHero = () => {
             <Globe size={32} />
           </div>
           <h3 className="text-xl font-bold text-slate-900">Expert Curation</h3>
-          <p className="text-sm text-slate-500">We don't outsource. Our team of local specialists vets every hotel, trail, and vehicle personally.</p>
+          <p className="text-sm text-slate-500">We do not outsource. Our team of local specialists vets every hotel, trail, and vehicle personally.</p>
         </div>
         <div className="flex flex-col items-center text-center space-y-4">
           <div className="h-16 w-16 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">

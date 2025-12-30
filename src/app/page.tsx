@@ -125,7 +125,7 @@ export default function Home() {
 
                 {/* Truncated Comment */}
                 <p className="text-gray-600 text-sm leading-relaxed line-clamp-3 italic px-2">
-                  "{review.comment}"
+                  {review.comment}
                 </p>
 
                 {/* Date Label */}
