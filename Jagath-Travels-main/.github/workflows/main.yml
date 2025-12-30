@@ -1,0 +1,68 @@
+name: Deploy Next.js App
+
+on:
+  push:
+    branches:
+      - main # Run workflow when changes are pushed to the main branch
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout Code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: yarn
+
+      # Step 3: Install Dependencies
+      - name: Install Dependencies
+        run: |
+          if [ -f yarn.lock ]; then yarn install --frozen-lockfile; \
+          elif [ -f package-lock.json ]; then npm install --legacy-peer-deps; \
+          elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm install --frozen-lockfile; \
+          else echo "Lockfile not found." && exit 1; \
+          fi
+
+      # Step 4: Build the Application
+      - name: Build Application
+        run: |
+          if [ -f yarn.lock ]; then yarn build; \
+          elif [ -f package-lock.json ]; then npm run build; \
+          elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
+          else echo "Lockfile not found." && exit 1; \
+          fi
+
+      # Step 5: Log in to GitHub Container Registry
+      - name: Log in to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GHCR_USERNAME }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      # Step 6: Build and Push Docker Image
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}/nextjs-app:latest .
+          docker push ghcr.io/${{ github.repository }}/nextjs-app:latest
+
+      # Step 7: Deploy to Server
+      - name: Deploy to Server
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          docker pull ghcr.io/${{ github.repository }}/nextjs-app:latest
+          docker stop nextjs-container || true
+          docker rm nextjs-container || true
+          docker run -d \
+            --name nextjs-container \
+            -p 3100:3100 \
+            --env-file .env.local \
+            ghcr.io/${{ github.repository }}/nextjs-app:latest
+          EOF
